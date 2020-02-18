@@ -232,7 +232,6 @@ public class PublicApiClient {
     private static String httpPostRequest(String path, Map<Object, Object> payload,
                                           Map<String, String> additionalHeaders) throws Exception {
         HttpRequest request = getCommonRequestBuilder(additionalHeaders)
-                .version(HttpClient.Version.HTTP_2)
                 .POST(getUrlEncodedFormData(payload))
                 .uri(URI.create(server + path))
                 .build();
@@ -240,11 +239,9 @@ public class PublicApiClient {
         return request(request);
     }
 
-    private static String httpPutRequest(String path, Map<Object, Object> payload, Map<String,
-            String> additionalHeaders) throws Exception {
-
+    private static String httpPutRequest(String path, Map<Object, Object> payload,
+                                         Map<String, String> additionalHeaders) throws Exception {
         HttpRequest request = getCommonRequestBuilder(additionalHeaders)
-                .version(HttpClient.Version.HTTP_2)
                 .PUT(getUrlEncodedFormData(payload))
                 .uri(URI.create(server + path))
                 .build();
