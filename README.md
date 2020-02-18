@@ -7,7 +7,8 @@ Please refer to the online documentation we provide on our
 - Maven
 
 # Quick start
-1. Replace the values of INTEGRATION_EMAIL and INTEGRATION_TOKEN in 
+1. Replace the values of INTEGRATION_EMAIL, INTEGRATION_PASSWORD and 
+INTEGRATION_TOKEN in 
 /src/main/java/com.flixbus.api.util.ExampleCodeHelper with your credentials.
 2. Run the main method in /src/main/java/com.flixbus.api.SearchExample.
 

@@ -43,7 +43,7 @@ public class PublicApiClient {
         data.put("email"   , request.getEmail());
         data.put("password", request.getPassword());
 
-        String json = httpPostRequest("/public/v1/partner/authenticate.json", data);
+        String json = httpPostRequest("/public/v1/partner/authenticate.json", data, new HashMap<>());
 
         AuthenticationResponse response = mapper.readValue(json, AuthenticationResponse.class);
         return response;
@@ -66,7 +66,7 @@ public class PublicApiClient {
                 .append("&bikes="         ).append(request.getBikes())
                 .append("&currency="      ).append(request.getCurrency());
 
-        String json = httpGetRequest(builder.toString());
+        String json = httpGetRequest(builder.toString(), new HashMap());
 
         TripSearchResponse response = mapper.readValue(json, TripSearchResponse.class);
         return response;
@@ -109,7 +109,7 @@ public class PublicApiClient {
         StringBuilder builder = new StringBuilder(path)
                 .append("?reservation_token=").append(request.getReservation_token());
 
-        String json = httpGetRequest(builder.toString());
+        String json = httpGetRequest(builder.toString(), new HashMap());
 
         PassengerDetailsResponse response = mapper.readValue(json, PassengerDetailsResponse.class);
         return response;
@@ -127,14 +127,16 @@ public class PublicApiClient {
         data.put("reservation_token", request.getPassengerRequest().getReservation_token());
 
         int i=0;
+        String key;
         for (Passenger passenger : request.getPassengerRequest().getPassengers()) {
-            data.put("passengers["+i+"][firstname]"            , passenger.getFirstname());
-            data.put("passengers["+i+"][lastname]"             , passenger.getLastname());
-            data.put("passengers["+i+"][phone]"                , passenger.getPhone());
-            data.put("passengers["+i+"][birthdate]"            , passenger.getBirthdate());
-            data.put("passengers["+i+"][type]"                 , passenger.getType());
-            data.put("passengers["+i+"][reference_id]"         , passenger.getReference_id());
-            data.put("passengers["+i+"][parental_permission]"  , passenger.isParental_permission());
+            key = String.format("passengers[%d]", i);
+            data.put(key + "[firstname]"            , passenger.getFirstname());
+            data.put(key + "[lastname]"             , passenger.getLastname());
+            data.put(key + "[phone]"                , passenger.getPhone());
+            data.put(key + "[birthdate]"            , passenger.getBirthdate());
+            data.put(key + "[type]"                 , passenger.getType());
+            data.put(key + "[reference_id]"         , passenger.getReference_id());
+            data.put(key + "[parental_permission]"  , passenger.isParental_permission());
 
             i++;
         }
@@ -145,33 +147,94 @@ public class PublicApiClient {
         return response;
     }
 
-    private static String httpGetRequest(String pathAndParams) throws Exception {
-        HttpRequest request = HttpRequest.newBuilder()
-                .version(HttpClient.Version.HTTP_2)
+    /**
+     * Returns the list of available payment methods.
+     */
+    public static PaymentListResponse getPaymentList(PaymentListRequest request) throws Exception {
+        String path = "/public/v1/payment/list.json";
+        StringBuilder builder = new StringBuilder(path)
+                .append("?reservation="      ).append(request.getReservationId())
+                .append("&reservation_token=").append(request.getReservationToken());
+
+        Map<String,String> additionalHeaders = new HashMap<>();
+        additionalHeaders.put("X-API-Session", request.getSessionToken());
+
+        String json = httpGetRequest(builder.toString(), additionalHeaders);
+
+        PaymentListResponse response = mapper.readValue(json, PaymentListResponse.class);
+        return response;
+    }
+
+    /**
+     * Starts the payment process.
+     */
+    public static PaymentStartResponse startPayment(PaymentStartRequest request) throws Exception {
+        Map<Object, Object> data = new HashMap<>();
+        data.put("reservation"      , request.getReservationId());
+        data.put("reservation_token", request.getReservationToken());
+        data.put("email"            , request.getEmail());
+        data.put("payment[psp]"     , request.getPaymentProvider());
+        data.put("payment[method]"  , request.getPaymentMethod());
+
+        Map<String,String> additionalHeaders = new HashMap<>();
+        additionalHeaders.put("X-API-Session", request.getSessionToken());
+
+        String json = httpPostRequest("/public/v1/payment/start.json", data, additionalHeaders);
+
+        PaymentStartResponse response = mapper.readValue(json, PaymentStartResponse.class);
+        return response;
+    }
+
+    /**
+     * Finalizes the payment process and creates the final
+     * booking.
+     */
+    public static PaymentCommitResponse commitPayment(PaymentCommitRequest request) throws Exception {
+        Map<Object, Object> data = new HashMap<>();
+        data.put("reservation",       request.getReservationId());
+        data.put("reservation_token", request.getReservationToken());
+        data.put("payment_id",        request.getPaymentId());
+
+        Map<String,String> additionalHeaders = new HashMap<>();
+        additionalHeaders.put("X-API-Session", request.getSessionToken());
+
+        String json = httpPutRequest("/public/v1/payment/commit.json", data, additionalHeaders);
+
+        PaymentCommitResponse response = mapper.readValue(json, PaymentCommitResponse.class);
+        return response;
+    }
+
+    /**
+     * Returns all data for a finalized booking
+     * (e.g. PDF download link for the ticket).
+     */
+    public static OrderResponse getOrderInfo(OrderInfoRequest request) throws Exception {
+        String path = String.format("/public/v2/orders/%s/info.json", request.getOrderId());
+
+        StringBuilder builder = new StringBuilder(path)
+                .append("?download_hash=").append(request.getDownload_hash());
+
+        String json = httpGetRequest(builder.toString(), new HashMap<>());
+
+        OrderResponse response = mapper.readValue(json, OrderResponse.class);
+        return response;
+    }
+
+    private static String httpGetRequest(String pathAndParams, Map<String, String> additionalHeaders) throws Exception {
+        HttpRequest request = getCommonRequestBuilder(additionalHeaders)
                 .GET()
                 .uri(URI.create(server + pathAndParams))
-                .headers("Accept"              , "application/json")
-                .headers("Accept-Enconding"    , "gzip, identity")
-                .headers("Accept-Language"     , "en")
-                .headers("User-Agent"          , "public-api-example-client")
-                .headers("Content-Type"        , "application/x-www-form-urlencoded")
-                .headers("X-API-Authentication", apiToken)
                 .build();
 
         return request(request);
     }
 
-    private static String httpPostRequest(String path, Map<Object, Object> payload) throws Exception {
-        HttpRequest request = HttpRequest.newBuilder()
+    private static String httpPostRequest(String path, Map<Object, Object> payload,
+                                          Map<String, String> additionalHeaders) throws Exception {
+        HttpRequest request = getCommonRequestBuilder(additionalHeaders)
                 .version(HttpClient.Version.HTTP_2)
                 .POST(getUrlEncodedFormData(payload))
                 .uri(URI.create(server + path))
-                .headers("Accept"              , "application/json")
-                .headers("Accept-Enconding"    , "gzip, identity")
-                .headers("Accept-Language"     , "en")
-                .headers("User-Agent"          , "public-api-example-client")
-                .headers("Content-Type"        , "application/x-www-form-urlencoded")
-                .headers("X-API-Authentication", apiToken)
                 .build();
 
         return request(request);
@@ -180,22 +243,11 @@ public class PublicApiClient {
     private static String httpPutRequest(String path, Map<Object, Object> payload, Map<String,
             String> additionalHeaders) throws Exception {
 
-        HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+        HttpRequest request = getCommonRequestBuilder(additionalHeaders)
                 .version(HttpClient.Version.HTTP_2)
                 .PUT(getUrlEncodedFormData(payload))
                 .uri(URI.create(server + path))
-                .headers("Accept"              , "application/json")
-                .headers("Accept-Enconding"    , "gzip, identity")
-                .headers("Accept-Language"     , "en")
-                .headers("User-Agent"          , "public-api-example-client")
-                .headers("Content-Type"        , "application/x-www-form-urlencoded")
-                .headers("X-API-Authentication", apiToken);
-
-        for (String header : additionalHeaders.keySet()){
-            requestBuilder.header(header, additionalHeaders.get(header));
-        }
-
-        HttpRequest request = requestBuilder.build();
+                .build();
 
         return request(request);
     }
@@ -225,5 +277,26 @@ public class PublicApiClient {
         }
 
         return HttpRequest.BodyPublishers.ofString(builder.toString());
+    }
+
+    /**
+     * Returns a HttpRequest.Builder that contains those
+     * headers that are common to all requests to the API.
+     */
+    private static HttpRequest.Builder getCommonRequestBuilder(Map<String, String> additionalHeaders) {
+        HttpRequest.Builder requestBuilder =  HttpRequest.newBuilder()
+                .version(HttpClient.Version.HTTP_2)
+                .headers("Accept"              , "application/json")
+                .headers("Accept-Enconding"    , "gzip, identity")
+                .headers("Accept-Language"     , "en")
+                .headers("User-Agent"          , "public-api-example-client")
+                .headers("Content-Type"        , "application/x-www-form-urlencoded")
+                .headers("X-API-Authentication", apiToken);
+
+        for (String header : additionalHeaders.keySet()){
+            requestBuilder.header(header, additionalHeaders.get(header));
+        }
+
+        return requestBuilder;
     }
 }

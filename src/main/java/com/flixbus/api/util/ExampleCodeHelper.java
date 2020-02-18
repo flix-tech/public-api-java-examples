@@ -16,8 +16,9 @@ import java.util.List;
  */
 public class ExampleCodeHelper {
 
-    public static final String INTEGRATION_EMAIL    = "YOUR-TEST-EMAIL";
-    public static final String INTEGRATION_TOKEN    = "YOUR_TEST_TOKEN";
+    public static final String INTEGRATION_EMAIL    = "YOUR_INTEGRATION_EMAIL";
+    public static final String INTEGRATION_PASSWORD = "YOUR_INTEGRATION_PASSWORD";
+    public static final String INTEGRATION_TOKEN    = "YOUR_INTEGRATION_TOKEN";
     public static final String INTEGRATION_SERVER   = "https://api-dev.flixbus.com";
 
     public static final int STATION_ID_BERLIN   = 88;
@@ -35,6 +36,23 @@ public class ExampleCodeHelper {
         to.setId(toStation);
 
         return new TripSearchRequest(departure, from, to);
+    }
+
+    public static PaymentListRequest getPaymentListRequest(ReservationResponse reservationResponse,
+                                                           AuthenticationResponse authResponse){
+        return new PaymentListRequest(reservationResponse.getReservation(), authResponse.getToken());
+    }
+
+    public static PaymentStartRequest getPaymentStartRequest(ReservationResponse reservationResponse,
+                                                             AuthenticationResponse authResponse) {
+        return new PaymentStartRequest(reservationResponse.getReservation(), authResponse.getToken());
+    }
+
+    public static PaymentCommitRequest getPaymentCommitRequest(ReservationResponse reservationResponse,
+                                                               PaymentStartResponse paymentStartResponse,
+                                                               AuthenticationResponse authResponse) {
+        return new PaymentCommitRequest(reservationResponse.getReservation(), paymentStartResponse.getPayment_id(),
+                authResponse.getToken());
     }
 
     public static ReservationRequest getReservationRequest(TripItem tripItemToBook, AuthenticationResponse authResponse) {
