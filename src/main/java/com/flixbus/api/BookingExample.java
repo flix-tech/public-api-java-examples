@@ -9,7 +9,7 @@ import static com.flixbus.api.util.ExampleCodeHelper.*;
  * API from trip search, thru reservation creation and
  * payment to retrieval of final booking data.
  *
- * It creates a reservation for 1 Adult on a return trip.
+ * It creates a booking for 1 Adult on a return trip.
  *
  * Please find detailed information on the method comments
  * below.
@@ -37,7 +37,7 @@ public class BookingExample {
             addPassengerDetailsToReservation(reservationResponse);
             System.out.println("- passenger added to reservation");
 
-            // finalize payment and booking
+            // finalize payment, which creates the booking
             PaymentCommitResponse paymentCommitResponse = finalizePayment(reservationResponse, authResponse);
             System.out.println("- payment finalized (booking created)");
 
@@ -61,8 +61,8 @@ public class BookingExample {
         TripSearchResponse searchResponse = PublicApiClient.tripSearch(searchRequest);
 
         // we create the reservation
-        TripItem tripItemToBook = searchResponse.getTrip(0).getTripItem(0);
-        ReservationRequest  reservationRequest  = getReservationRequest(tripItemToBook, authResponse);
+        TripItem tripItemToBook               = searchResponse.getTrip(0).getTripItem(0);
+        ReservationRequest reservationRequest = getReservationRequest(tripItemToBook, authResponse);
 
         return PublicApiClient.createReservation(reservationRequest);
     }
@@ -91,8 +91,8 @@ public class BookingExample {
      * from trip to trip. E.g. on the first trip you may have only
      * 1 passenger and on the trip back there could be 2 passengers.
      *
-     * For the sake of simplicity we have the same single passenger
-     * on both trips of the reservation.
+     * For the sake of simplicity in this example we have the same
+     * single passenger on both trips of the reservation.
      */
     private static void addPassengerDetailsToReservation(ReservationResponse reservationResponse) throws Exception {
         // first we need to get a passenger details object
@@ -107,7 +107,7 @@ public class BookingExample {
     }
 
     /**
-     * In order to create a Booking we need to finalize
+     * In order to create a booking we need to finalize
      * the payment which is done in 3 steps.
      */
     private static PaymentCommitResponse finalizePayment(ReservationResponse reservationResponse,

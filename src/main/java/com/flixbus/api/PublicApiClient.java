@@ -50,7 +50,7 @@ public class PublicApiClient {
     }
 
     /**
-     * Get available trips between cities with all the stations
+     * Get available trips between cities with all the station
      * combinations possible belonging to each city.
      *
      * https://developer.flix.tech/#get_trip_search
