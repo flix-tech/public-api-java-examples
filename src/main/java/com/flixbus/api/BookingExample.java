@@ -57,7 +57,7 @@ public class BookingExample {
      */
     private static ReservationResponse createReservation(AuthenticationResponse authResponse) throws Exception {
         // we need a search response, to pick a TripItem to be booked
-        TripSearchRequest  searchRequest  = getTripSearchRequest(STATION_ID_BERLIN, STATION_ID_MUNICH, 7);
+        TripSearchRequest  searchRequest  = getTripSearchRequest(STATION_ID_BERLIN, STATION_ID_MUNICH, 30);
         TripSearchResponse searchResponse = PublicApiClient.tripSearch(searchRequest);
 
         // we create the reservation
@@ -75,7 +75,7 @@ public class BookingExample {
     private static ReservationResponse addTripToReservation(AuthenticationResponse authResponse,
                                                             ReservationResponse reservationResponse) throws Exception {
         // we add a (return) trip to the reservation
-        TripSearchRequest searchRequest   = getTripSearchRequest(STATION_ID_MUNICH, STATION_ID_BERLIN, 9);
+        TripSearchRequest searchRequest   = getTripSearchRequest(STATION_ID_MUNICH, STATION_ID_BERLIN, 32);
         TripSearchResponse searchResponse = PublicApiClient.tripSearch(searchRequest);
 
         TripItem tripItemToBook                = searchResponse.getTrip(0).getTripItem(1);
