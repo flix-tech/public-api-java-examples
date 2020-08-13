@@ -10,6 +10,7 @@ public class OrderInfo {
     private String reminder_link;
     private String qr_data;
     private String qr_image;
+    private String invoice_link;
 
     private List<OrderInfoTrip> trips;
     private List<OrderInfoInvoice> invoices;
@@ -103,5 +104,13 @@ public class OrderInfo {
 
     public void setTaxes(List<OrderInfoTax> taxes) {
         this.taxes = taxes;
+    }
+
+    public String getInvoice_link() {
+        return invoice_link;
+    }
+
+    public void setInvoice_link(String invoice_link) {
+        this.invoice_link = invoice_link;
     }
 }
