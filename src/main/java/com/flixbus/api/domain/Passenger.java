@@ -15,6 +15,8 @@ public class Passenger {
     private String product_type = "";
     private String type = "";
     private String reference_id = "";
+    private String hes_code = "";
+    private String ticket_id = "";
 
     private boolean parental_permission;
 
@@ -138,5 +140,21 @@ public class Passenger {
 
     public void setPassenger_no(int passenger_no) {
         this.passenger_no = passenger_no;
+    }
+
+    public String getHes_code() {
+        return hes_code;
+    }
+
+    public void setHes_code(String hes_code) {
+        this.hes_code = hes_code;
+    }
+
+    public String getTicket_id() {
+        return ticket_id;
+    }
+
+    public void setTicket_id(String ticket_id) {
+        this.ticket_id = ticket_id;
     }
 }

@@ -24,4 +24,4 @@ in package com.flixbus.api.domain as is since the deserialization from api
 responses works out of the box (using the Jackson library).
 
 However we do not make any warranties about the completeness of the code.
-You will need to implement you client due to your business requirements.
+You will need to implement your client due to your business requirements.
