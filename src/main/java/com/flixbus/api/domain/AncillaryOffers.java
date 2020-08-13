@@ -1,5 +1,8 @@
 package com.flixbus.api.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class AncillaryOffers {
 
     private AncillaryOfferCollection luggage_additional;
