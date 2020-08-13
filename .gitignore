@@ -10,3 +10,6 @@ buildNumber.properties
 .mvn/wrapper/maven-wrapper.jar
 .idea/*
 *.iml
+.classpath
+.project
+.settings
