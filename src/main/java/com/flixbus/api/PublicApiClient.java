@@ -284,7 +284,6 @@ public class PublicApiClient {
         HttpRequest.Builder requestBuilder =  HttpRequest.newBuilder()
                 .version(HttpClient.Version.HTTP_2)
                 .headers("Accept"              , "application/json")
-                .headers("Accept-Enconding"    , "gzip, identity")
                 .headers("Accept-Language"     , "en")
                 .headers("User-Agent"          , "public-api-example-client")
                 .headers("Content-Type"        , "application/x-www-form-urlencoded")
