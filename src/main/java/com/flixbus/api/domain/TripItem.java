@@ -36,6 +36,8 @@ public class TripItem {
 
     private List<Link> links = new ArrayList<>();
 
+    private List<List<String>> amenities = new ArrayList<>();
+
     public String getType() {
         return type;
     }
@@ -203,4 +205,8 @@ public class TripItem {
     public void setLinks(List<Link> links) {
         this.links = links;
     }
+
+    public List<List<String>> getAmenities() { return amenities; }
+
+    public void setAmenities(List<List<String>> amenities) { this.amenities = amenities; }
 }

@@ -6,10 +6,9 @@ public class OrderInfoPassenger {
     private String firstname;
     private String lastname;
     private String phone;
+    private String uuid;
 
-    public String getType() {
-        return type;
-    }
+    public String getType() { return type; }
 
     public void setType(String type) {
         this.type = type;
@@ -38,4 +37,8 @@ public class OrderInfoPassenger {
     public void setPhone(String phone) {
         this.phone = phone;
     }
+
+    public String getUuid() { return uuid; }
+
+    public void setUuid(String uuid) { this.uuid = uuid; }
 }

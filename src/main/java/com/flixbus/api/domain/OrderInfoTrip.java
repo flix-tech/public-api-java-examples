@@ -11,6 +11,7 @@ public class OrderInfoTrip {
     private String order_status;
     private String push_channel_uid;
     private String trip_uid;
+    private String ride_uuid;
     private String products_description;
     private String products_description_html;
 
@@ -73,6 +74,14 @@ public class OrderInfoTrip {
 
     public void setTrip_uid(String trip_uid) {
         this.trip_uid = trip_uid;
+    }
+
+    public String getRide_uuid() {
+        return ride_uuid;
+    }
+
+    public void setRide_uuid(String ride_uuid) {
+        this.ride_uuid = ride_uuid;
     }
 
     public String getProducts_description() {
